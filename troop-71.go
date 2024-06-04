@@ -23,7 +23,11 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 
 	vpc := awsec2.NewVpc(stack, jsii.String("Troop71Vpc"), &awsec2.VpcProps{
 
-		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{},
+		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
+			SubnetType: awsec2.SubnetType_PUBLIC,
+			Name:       jsii.String("Public"),
+		},
+		},
 	})
 
 	awsrds.NewDatabaseInstance(stack, jsii.String("Troop71RdsInstance"), &awsrds.DatabaseInstanceProps{
