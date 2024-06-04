@@ -27,7 +27,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
       - name: Sts GetCallerIdentity
         run: |
           aws sts get-caller-identity
