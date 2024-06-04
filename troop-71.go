@@ -24,7 +24,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	vpc := awsec2.NewVpc(stack, jsii.String("Troop71Vpc"), &awsec2.VpcProps{})
 
 	awsrds.NewDatabaseInstance(stack, jsii.String("Troop71RdsInstance"), &awsrds.DatabaseInstanceProps{
-		Vpc: vpc,
+		Vpc:          vpc,
+		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
+		Engine:       awsrds.DatabaseInstanceEngine_POSTGRES(),
 	})
 
 	return stack
