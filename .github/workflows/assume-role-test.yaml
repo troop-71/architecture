@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-
+  AWS_ACCOUNT: 470576235824
   AWS_REGION : us-west-2
 
 permissions:
@@ -22,9 +22,20 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
-          role-to-assume: arn:aws:iam::470576235824:role/GitHubActions
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/GitHubActions
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ env.AWS_REGION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
       - name: Sts GetCallerIdentity
         run: |
           aws sts get-caller-identity
+          aws --version
+      - name: Install CDK
+        run: |
+          npm install -g aws-cdk
+          cdk --version
+      - name: Bootstrap CDK
+        run: |
+          cdk bootstrap aws://${{ env.AWS_ACCOUNT }}/${{ env.AWS_REGION }}
