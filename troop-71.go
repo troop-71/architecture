@@ -22,17 +22,17 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
 	vpc := awsec2.NewVpc(stack, jsii.String("Troop71Vpc"), &awsec2.VpcProps{
-		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
-			SubnetType: awsec2.SubnetType_PUBLIC,
-			Name:       jsii.String("Public"),
-		},
-		},
+
+		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{},
 	})
 
 	awsrds.NewDatabaseInstance(stack, jsii.String("Troop71RdsInstance"), &awsrds.DatabaseInstanceProps{
 		Vpc:          vpc,
 		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
 		Engine:       awsrds.DatabaseInstanceEngine_POSTGRES(),
+		VpcSubnets: &awsec2.SubnetSelection{
+			SubnetType: awsec2.SubnetType_PUBLIC,
+		},
 	})
 
 	return stack
