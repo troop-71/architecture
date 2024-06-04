@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsec2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsrds"
 
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
@@ -20,7 +21,11 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	awsrds.NewDatabaseInstance(stack, jsii.String("Troop71RdsInstance"), &awsrds.DatabaseInstanceProps{})
+	vpc := awsec2.NewVpc(stack, jsii.String("Troop71Vpc"), &awsec2.VpcProps{})
+
+	awsrds.NewDatabaseInstance(stack, jsii.String("Troop71RdsInstance"), &awsrds.DatabaseInstanceProps{
+		Vpc: vpc,
+	})
 
 	return stack
 }
