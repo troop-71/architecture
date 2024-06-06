@@ -30,7 +30,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		},
 	})
 
-	awsrds.NewDatabaseInstance(stack, jsii.String("Troop71RdsInstance"), &awsrds.DatabaseInstanceProps{
+	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("Troop71RdsInstance"), &awsrds.DatabaseInstanceProps{
 		Vpc:          vpc,
 		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
 		Engine:       awsrds.DatabaseInstanceEngine_POSTGRES(),
@@ -38,6 +38,8 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		},
 	})
+
+	postgres.Connections().AllowDefaultPortFromAnyIpv4(jsii.String("Allow Connections"))
 
 	return stack
 }
