@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsec2"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsecs"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsecspatterns"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsrds"
 
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
@@ -21,16 +23,16 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	vpc := awsec2.NewVpc(stack, jsii.String("Troop71Vpc"), &awsec2.VpcProps{
+	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
 
 		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
 			SubnetType: awsec2.SubnetType_PUBLIC,
-			Name:       jsii.String("Public"),
+			Name:       jsii.String("subnet"),
 		},
 		},
 	})
 
-	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("Troop71RdsInstance"), &awsrds.DatabaseInstanceProps{
+	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
 		Vpc:          vpc,
 		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
 		Engine:       awsrds.DatabaseInstanceEngine_POSTGRES(),
@@ -39,7 +41,28 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		},
 	})
 
-	postgres.Connections().AllowDefaultPortFromAnyIpv4(jsii.String("Allow Connections"))
+	postgres.Connections().AllowDefaultPortFromAnyIpv4(jsii.String("open port"))
+
+	cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
+		Vpc: vpc,
+	})
+
+	awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
+		Cluster: cluster,
+		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
+			Image: awsecs.ContainerImage_FromRegistry(
+				jsii.String("ghcr.io/requarks/wiki:2"),
+				&awsecs.RepositoryImageProps{},
+			),
+			Secrets: &map[string]awsecs.Secret{
+				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
+				"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
+				"DB_PORT": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("port")),
+				"DB_HOST": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("host")),
+				"DB_TYPE": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("engine")),
+			},
+		},
+	})
 
 	return stack
 }
