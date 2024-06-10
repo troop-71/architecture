@@ -8,6 +8,9 @@ env:
   AWS_ACCOUNT: 470576235824
   AWS_REGION : us-west-2
 
+concurrency:
+  group: ${{ github.workflow }}
+
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
