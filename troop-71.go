@@ -41,11 +41,10 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		},
 	})
 
-	postgres.Connections().AllowDefaultPortFromAnyIpv4(jsii.String("open port"))
-
 	cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
 		Vpc: vpc,
 	})
+	cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
 
 	awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
 		Cluster: cluster,
@@ -63,6 +62,8 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			},
 		},
 	})
+
+	postgres.Connections().AllowDefaultPortFrom(cluster, jsii.String("allow cluster to rds"))
 
 	return stack
 }
