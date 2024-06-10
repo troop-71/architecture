@@ -30,7 +30,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		}},
 	})
 
-	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
+	awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
 		Vpc:          vpc,
 		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
 		Engine:       awsrds.DatabaseInstanceEngine_POSTGRES(),
@@ -42,15 +42,18 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
 		Vpc: vpc,
 	})
+
 	//cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
 
 	awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
-		Cluster: cluster,
+		Cluster:        cluster,
+		AssignPublicIp: jsii.Bool(true),
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
 			Image: awsecs.ContainerImage_FromRegistry(
 				jsii.String("ghcr.io/requarks/wiki:2"),
 				&awsecs.RepositoryImageProps{},
 			),
+
 			Secrets: &map[string]awsecs.Secret{
 				//"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
 				//"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
