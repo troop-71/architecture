@@ -64,7 +64,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		},
 	})
 
-	//postgres.Connections().AllowDefaultPortFrom(cluster, jsii.String("allow cluster to rds"))
+	postgres.Connections().AllowDefaultPortFrom(cluster, jsii.String("allow cluster to rds"))
 
 	return stack
 }
