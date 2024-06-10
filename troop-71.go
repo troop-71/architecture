@@ -24,12 +24,10 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
 	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
-
 		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
 			SubnetType: awsec2.SubnetType_PUBLIC,
 			Name:       jsii.String("subnet"),
-		},
-		},
+		}},
 	})
 
 	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
@@ -44,7 +42,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
 		Vpc: vpc,
 	})
-	cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
+	//cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
 
 	awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
 		Cluster: cluster,
@@ -54,16 +52,16 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 				&awsecs.RepositoryImageProps{},
 			),
 			Secrets: &map[string]awsecs.Secret{
-				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
-				"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
-				"DB_PORT": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("port")),
-				"DB_HOST": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("host")),
-				"DB_TYPE": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("engine")),
+				//"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
+				//"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
+				//"DB_PORT": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("port")),
+				//"DB_HOST": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("host")),
+				//"DB_TYPE": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("engine")),
 			},
 		},
 	})
 
-	postgres.Connections().AllowDefaultPortFrom(cluster, jsii.String("allow cluster to rds"))
+	//postgres.Connections().AllowDefaultPortFrom(cluster, jsii.String("allow cluster to rds"))
 
 	return stack
 }
