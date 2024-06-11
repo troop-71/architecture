@@ -47,8 +47,11 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	//cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
 
 	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
-		Cluster:              cluster,
-		AssignPublicIp:       jsii.Bool(true),
+		Cluster:        cluster,
+		AssignPublicIp: jsii.Bool(true),
+		CircuitBreaker: &awsecs.DeploymentCircuitBreaker{
+			Enable: jsii.Bool(false),
+		},
 		EnableECSManagedTags: jsii.Bool(true),
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
 			Image: awsecs.ContainerImage_FromRegistry(
