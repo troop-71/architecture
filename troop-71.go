@@ -37,6 +37,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		VpcSubnets: &awsec2.SubnetSelection{
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		},
+		DatabaseName: jsii.String("wiki"),
 	})
 
 	cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
@@ -45,15 +46,18 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 
 	//cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
 
-	awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
-		Cluster:        cluster,
-		AssignPublicIp: jsii.Bool(true),
+	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
+		Cluster:              cluster,
+		AssignPublicIp:       jsii.Bool(true),
+		EnableECSManagedTags: jsii.Bool(true),
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
 			Image: awsecs.ContainerImage_FromRegistry(
 				jsii.String("ghcr.io/requarks/wiki:2"),
 				&awsecs.RepositoryImageProps{},
 			),
-
+			Environment: &map[string]*string{
+				//"DB_TYPE": jsii.String("postgres"),
+			},
 			Secrets: &map[string]awsecs.Secret{
 				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
 				"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
@@ -63,7 +67,6 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			},
 		},
 	})
-
 	postgres.Connections().AllowDefaultPortFrom(cluster, jsii.String("allow cluster to rds"))
 
 	return stack

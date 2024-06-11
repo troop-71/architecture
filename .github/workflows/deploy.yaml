@@ -38,9 +38,9 @@ jobs:
         run: |
           npm install -g aws-cdk
           cdk --version
-      - name: Bootstrap CDK
-        run: |
-          cdk bootstrap aws://${{ env.AWS_ACCOUNT }}/${{ env.AWS_REGION }}
+#      - name: Bootstrap CDK
+#        run: |
+#          cdk bootstrap aws://${{ env.AWS_ACCOUNT }}/${{ env.AWS_REGION }}
       - uses: actions/setup-go@v5
         name: Install Go
         with:
