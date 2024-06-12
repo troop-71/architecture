@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsec2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecs"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsecspatterns"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsrds"
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 	"github.com/aws/constructs-go/constructs/v10"
@@ -28,7 +29,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		}},
 	})
 
-	awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
+	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
 		Vpc:          vpc,
 		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
 		Engine:       awsrds.DatabaseInstanceEngine_POSTGRES(),
@@ -38,47 +39,47 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		DatabaseName: jsii.String("wiki"),
 	})
 
-	awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
+	cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
 		Vpc: vpc,
 	})
 
 	//cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
 
-	//ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
-	//	Cluster:        cluster,
-	//	AssignPublicIp: jsii.Bool(true),
-	//	//CircuitBreaker: &awsecs.DeploymentCircuitBreaker{
-	//	//	Enable: jsii.Bool(false),
-	//	//},
-	//	//DesiredCount:         jsii.Number(0),
-	//	EnableECSManagedTags: jsii.Bool(true),
-	//	TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
-	//		Image: awsecs.ContainerImage_FromRegistry(
-	//			jsii.String("ghcr.io/requarks/wiki:2"),
-	//			&awsecs.RepositoryImageProps{},
-	//		),
-	//		Environment: &map[string]*string{
-	//			//"DB_TYPE": jsii.String("postgres"),
-	//		},
-	//		Secrets: &map[string]awsecs.Secret{
-	//			"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
-	//			"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
-	//			"DB_PORT": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("port")),
-	//			"DB_HOST": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("host")),
-	//			"DB_TYPE": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("engine")),
-	//		},
-	//	},
-	//	Vpc: vpc,
-	//	TaskSubnets: &awsec2.SubnetSelection{
-	//		SubnetType: awsec2.SubnetType_PUBLIC,
-	//	},
-	//})
-	//
-	//postgres.Connections().AllowDefaultPortFrom(
-	//	ecs.Service(),
-	//	//awsec2.Port_TcpRange(jsii.Number(5432), jsii.Number(5432)),
-	//	jsii.String("allow cluster to rds"),
-	//)
+	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
+		Cluster:        cluster,
+		AssignPublicIp: jsii.Bool(true),
+		//CircuitBreaker: &awsecs.DeploymentCircuitBreaker{
+		//	Enable: jsii.Bool(false),
+		//},
+		//DesiredCount:         jsii.Number(0),
+		EnableECSManagedTags: jsii.Bool(true),
+		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
+			Image: awsecs.ContainerImage_FromRegistry(
+				jsii.String("ghcr.io/requarks/wiki:2"),
+				&awsecs.RepositoryImageProps{},
+			),
+			Environment: &map[string]*string{
+				//"DB_TYPE": jsii.String("postgres"),
+			},
+			Secrets: &map[string]awsecs.Secret{
+				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
+				"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
+				"DB_PORT": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("port")),
+				"DB_HOST": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("host")),
+				"DB_TYPE": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("engine")),
+			},
+		},
+		Vpc: vpc,
+		TaskSubnets: &awsec2.SubnetSelection{
+			SubnetType: awsec2.SubnetType_PUBLIC,
+		},
+	})
+
+	postgres.Connections().AllowDefaultPortFrom(
+		ecs.Service(),
+		//awsec2.Port_TcpRange(jsii.Number(5432), jsii.Number(5432)),
+		jsii.String("allow cluster to rds"),
+	)
 
 	//importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
 	//	stack,
