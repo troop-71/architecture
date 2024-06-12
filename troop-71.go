@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsec2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecs"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecspatterns"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awselasticloadbalancingv2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsrds"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
 	"github.com/aws/constructs-go/constructs/v10"
@@ -46,9 +47,17 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		},
 	)
 
+	//cert := awscertificatemanager.NewCertificate(stack, jsii.String("ssl cert"), &awscertificatemanager.CertificateProps{
+	//	DomainName: jsii.String("troop-71.com"),
+	//	Validation: awscertificatemanager.CertificateValidation_FromDns(importedHostedZone),
+	//})
+
 	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
 		AssignPublicIp:       jsii.Bool(true),
 		EnableECSManagedTags: jsii.Bool(true),
+		RedirectHTTP:         jsii.Bool(true),
+		Protocol:             awselasticloadbalancingv2.ApplicationProtocol_HTTPS,
+		//Certificate:          cert,
 		HealthCheck: &awsecs.HealthCheck{
 			Command: &[]*string{
 				jsii.String("CMD-SHELL"),
