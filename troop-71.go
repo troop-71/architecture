@@ -42,6 +42,11 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
 		AssignPublicIp:       jsii.Bool(true),
 		EnableECSManagedTags: jsii.Bool(true),
+		HealthCheck: &awsecs.HealthCheck{
+			Command: &[]*string{
+				jsii.String("CMD-SHELL"),
+				jsii.String("curl -f http://localhost/healthz || exit 1"),
+			}},
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
 			Image: awsecs.ContainerImage_FromRegistry(
 				jsii.String("ghcr.io/requarks/wiki:2"),
