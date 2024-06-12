@@ -48,6 +48,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 				jsii.String("ghcr.io/requarks/wiki:2"),
 				&awsecs.RepositoryImageProps{},
 			),
+			Environment: &map[string]*string{
+				"DB_NAME": jsii.String("wiki"),
+			},
 			Secrets: &map[string]awsecs.Secret{
 				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
 				"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
