@@ -33,20 +33,20 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		Vpc:          vpc,
 		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
 		Engine:       awsrds.DatabaseInstanceEngine_POSTGRES(),
-		VpcSubnets: &awsec2.SubnetSelection{
-			SubnetType: awsec2.SubnetType_PUBLIC,
-		},
+		//VpcSubnets: &awsec2.SubnetSelection{
+		//	SubnetType: awsec2.SubnetType_PUBLIC,
+		//},
 		DatabaseName: jsii.String("wiki"),
 	})
 
-	cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
-		Vpc: vpc,
-	})
+	//cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
+	//	Vpc: vpc,
+	//})
 
 	//cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
 
 	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
-		Cluster:        cluster,
+		//Cluster:        cluster,
 		AssignPublicIp: jsii.Bool(true),
 		//CircuitBreaker: &awsecs.DeploymentCircuitBreaker{
 		//	Enable: jsii.Bool(false),
@@ -70,9 +70,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			},
 		},
 		Vpc: vpc,
-		TaskSubnets: &awsec2.SubnetSelection{
-			SubnetType: awsec2.SubnetType_PUBLIC,
-		},
+		//TaskSubnets: &awsec2.SubnetSelection{
+		//	SubnetType: awsec2.SubnetType_PUBLIC,
+		//},
 	})
 
 	postgres.Connections().AllowDefaultPortFrom(
@@ -89,7 +89,15 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	//		ZoneName:     jsii.String("troop-71.com"),
 	//	},
 	//)
-
+	//
+	//awsapigateway.NewRestApi(stack,jsii.String("api"),&awsapigateway.RestApiProps{
+	//
+	//})
+	//awsapigateway.NewMethod(stack,jsii.String("method"),&awsapigateway.MethodProps{
+	//	HttpMethod: jsii. String("httpMethod"),
+	//	Resource:
+	//})
+	//
 	//awsroute53.NewARecord(stack, jsii.String("A record"), &awsroute53.ARecordProps{
 	//	Zone:   importedHostedZone,
 	//})
