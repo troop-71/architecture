@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53targets"
 
-	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 )
@@ -61,7 +60,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		},
 		Vpc: vpc,
 	})
-	//
+
 	postgres.Connections().AllowDefaultPortFrom(
 		ecs.Service(),
 		jsii.String("allow cluster to rds"),
