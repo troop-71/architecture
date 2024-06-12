@@ -49,6 +49,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			),
 			Environment: &map[string]*string{
 				"DB_NAME": jsii.String("wiki"),
+				"PORT":    jsii.String("80"),
 			},
 			Secrets: &map[string]awsecs.Secret{
 				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
