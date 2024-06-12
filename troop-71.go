@@ -23,10 +23,10 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
 	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
-		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
-			SubnetType: awsec2.SubnetType_PUBLIC,
-			Name:       jsii.String("subnet"),
-		}},
+		//SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
+		//	SubnetType: awsec2.SubnetType_PUBLIC,
+		//	Name:       jsii.String("subnet"),
+		//}},
 	})
 
 	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
