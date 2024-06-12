@@ -6,7 +6,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecs"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecspatterns"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsrds"
-
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
@@ -49,9 +48,10 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
 		Cluster:        cluster,
 		AssignPublicIp: jsii.Bool(true),
-		CircuitBreaker: &awsecs.DeploymentCircuitBreaker{
-			Enable: jsii.Bool(false),
-		},
+		//CircuitBreaker: &awsecs.DeploymentCircuitBreaker{
+		//	Enable: jsii.Bool(false),
+		//},
+		DesiredCount:         jsii.Number(0),
 		EnableECSManagedTags: jsii.Bool(true),
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
 			Image: awsecs.ContainerImage_FromRegistry(
@@ -75,6 +75,19 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		//awsec2.Port_TcpRange(jsii.Number(5432), jsii.Number(5432)),
 		jsii.String("allow cluster to rds"),
 	)
+
+	//importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
+	//	stack,
+	//	jsii.String("hosted zone"),
+	//	&awsroute53.HostedZoneAttributes{
+	//		HostedZoneId: jsii.String("Z02543953LEPR7NK5UEHN"),
+	//		ZoneName:     jsii.String("troop-71.com"),
+	//	},
+	//)
+
+	//awsroute53.NewARecord(stack, jsii.String("A record"), &awsroute53.ARecordProps{
+	//	Zone:   importedHostedZone,
+	//})
 
 	return stack
 }
