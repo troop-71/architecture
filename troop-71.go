@@ -6,6 +6,9 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecs"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecspatterns"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsrds"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53targets"
+
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
@@ -22,48 +25,29 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
-		//SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
-		//	SubnetType: awsec2.SubnetType_PUBLIC,
-		//	Name:       jsii.String("subnet"),
-		//}},
+	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{})
+	engine := awsrds.DatabaseInstanceEngine_Postgres(&awsrds.PostgresInstanceEngineProps{
+		Version: awsrds.PostgresEngineVersion_VER_16_3(),
 	})
 
 	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
 		Vpc:          vpc,
 		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
-		Engine:       awsrds.DatabaseInstanceEngine_POSTGRES(),
-		//VpcSubnets: &awsec2.SubnetSelection{
-		//	SubnetType: awsec2.SubnetType_PUBLIC,
-		//},
+		Engine:       engine,
 		DatabaseName: jsii.String("wiki"),
 		Parameters: &map[string]*string{
 			"rds.force_ssl": jsii.String("0"),
 		},
 	})
 
-	//cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
-	//	Vpc: vpc,
-	//})
-
-	//cluster.Connections().AllowToAnyIpv4(awsec2.Port_HTTPS(), jsii.String("allow https"))
-
 	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
-		//Cluster:        cluster,
-		AssignPublicIp: jsii.Bool(true),
-		//CircuitBreaker: &awsecs.DeploymentCircuitBreaker{
-		//	Enable: jsii.Bool(false),
-		//},
-		//DesiredCount:         jsii.Number(0),
+		AssignPublicIp:       jsii.Bool(true),
 		EnableECSManagedTags: jsii.Bool(true),
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
 			Image: awsecs.ContainerImage_FromRegistry(
 				jsii.String("ghcr.io/requarks/wiki:2"),
 				&awsecs.RepositoryImageProps{},
 			),
-			Environment: &map[string]*string{
-				//"DB_TYPE": jsii.String("postgres"),
-			},
 			Secrets: &map[string]awsecs.Secret{
 				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
 				"DB_USER": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("username")),
@@ -73,37 +57,25 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			},
 		},
 		Vpc: vpc,
-		//TaskSubnets: &awsec2.SubnetSelection{
-		//	SubnetType: awsec2.SubnetType_PUBLIC,
-		//},
 	})
 	//
 	postgres.Connections().AllowDefaultPortFrom(
 		ecs.Service(),
-		//awsec2.Port_TcpRange(jsii.Number(5432), jsii.Number(5432)),
 		jsii.String("allow cluster to rds"),
 	)
 
-	//importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
-	//	stack,
-	//	jsii.String("hosted zone"),
-	//	&awsroute53.HostedZoneAttributes{
-	//		HostedZoneId: jsii.String("Z02543953LEPR7NK5UEHN"),
-	//		ZoneName:     jsii.String("troop-71.com"),
-	//	},
-	//)
-	//
-	//awsapigateway.NewRestApi(stack,jsii.String("api"),&awsapigateway.RestApiProps{
-	//
-	//})
-	//awsapigateway.NewMethod(stack,jsii.String("method"),&awsapigateway.MethodProps{
-	//	HttpMethod: jsii. String("httpMethod"),
-	//	Resource:
-	//})
-	//
-	//awsroute53.NewARecord(stack, jsii.String("A record"), &awsroute53.ARecordProps{
-	//	Zone:   importedHostedZone,
-	//})
+	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
+		stack,
+		jsii.String("hosted zone"),
+		&awsroute53.HostedZoneAttributes{
+			HostedZoneId: jsii.String("Z02543953LEPR7NK5UEHN"),
+			ZoneName:     jsii.String("troop-71.com"),
+		},
+	)
+	awsroute53.NewARecord(stack, jsii.String("A record"), &awsroute53.ARecordProps{
+		Zone:   importedHostedZone,
+		Target: awsroute53.RecordTarget_FromAlias(awsroute53targets.NewLoadBalancerTarget(ecs.LoadBalancer())),
+	})
 
 	return stack
 }
