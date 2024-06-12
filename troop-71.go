@@ -37,6 +37,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		//	SubnetType: awsec2.SubnetType_PUBLIC,
 		//},
 		DatabaseName: jsii.String("wiki"),
+		Parameters: &map[string]*string{
+			"rds.force_ssl": jsii.String("0"),
+		},
 	})
 
 	//cluster := awsecs.NewCluster(stack, jsii.String("cluster"), &awsecs.ClusterProps{
