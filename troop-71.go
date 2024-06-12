@@ -7,8 +7,6 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsecspatterns"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsrds"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53"
-	"github.com/aws/aws-cdk-go/awscdk/v2/awsroute53targets"
-
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 )
@@ -39,22 +37,31 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		},
 	})
 
+	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
+		stack,
+		jsii.String("hosted zone"),
+		&awsroute53.HostedZoneAttributes{
+			HostedZoneId: jsii.String("Z02543953LEPR7NK5UEHN"),
+			ZoneName:     jsii.String("troop-71.com"),
+		},
+	)
+
 	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
 		AssignPublicIp:       jsii.Bool(true),
 		EnableECSManagedTags: jsii.Bool(true),
 		HealthCheck: &awsecs.HealthCheck{
 			Command: &[]*string{
 				jsii.String("CMD-SHELL"),
-				jsii.String("curl -f http://localhost/healthz || exit 1"),
+				jsii.String("curl -f http://localhost:3000/healthz || exit 1"),
 			}},
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
+			ContainerPort: jsii.Number(3000),
 			Image: awsecs.ContainerImage_FromRegistry(
 				jsii.String("ghcr.io/requarks/wiki:2"),
 				&awsecs.RepositoryImageProps{},
 			),
 			Environment: &map[string]*string{
 				"DB_NAME": jsii.String("wiki"),
-				"PORT":    jsii.String("80"),
 			},
 			Secrets: &map[string]awsecs.Secret{
 				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
@@ -64,26 +71,16 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 				"DB_TYPE": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("engine")),
 			},
 		},
-		Vpc: vpc,
+		Vpc:          vpc,
+		ListenerPort: jsii.Number(443),
+		DomainName:   jsii.String("troop-71.com"),
+		DomainZone:   importedHostedZone,
 	})
 
 	postgres.Connections().AllowDefaultPortFrom(
 		ecs.Service(),
 		jsii.String("allow cluster to rds"),
 	)
-
-	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
-		stack,
-		jsii.String("hosted zone"),
-		&awsroute53.HostedZoneAttributes{
-			HostedZoneId: jsii.String("Z02543953LEPR7NK5UEHN"),
-			ZoneName:     jsii.String("troop-71.com"),
-		},
-	)
-	awsroute53.NewARecord(stack, jsii.String("A record"), &awsroute53.ARecordProps{
-		Zone:   importedHostedZone,
-		Target: awsroute53.RecordTarget_FromAlias(awsroute53targets.NewLoadBalancerTarget(ecs.LoadBalancer())),
-	})
 
 	return stack
 }
