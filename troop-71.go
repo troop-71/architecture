@@ -63,6 +63,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		RedirectHTTP:         jsii.Bool(true),
 		Protocol:             awselasticloadbalancingv2.ApplicationProtocol_HTTPS,
 		Cpu:                  jsii.Number(512),
+		MemoryLimitMiB:       jsii.Number(1024),
 		CapacityProviderStrategies: &[]*awsecs.CapacityProviderStrategy{{
 			CapacityProvider: jsii.String("FARGATE_SPOT"),
 		}},
