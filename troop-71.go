@@ -66,6 +66,10 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		MemoryLimitMiB:       jsii.Number(1024),
 		CapacityProviderStrategies: &[]*awsecs.CapacityProviderStrategy{{
 			CapacityProvider: jsii.String("FARGATE_SPOT"),
+			Weight:           jsii.Number(1000),
+		}, {
+			CapacityProvider: jsii.String("FARGATE"),
+			Weight:           jsii.Number(1),
 		}},
 
 		HealthCheck: &awsecs.HealthCheck{
