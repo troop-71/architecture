@@ -43,6 +43,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		Parameters: &map[string]*string{
 			"rds.force_ssl": jsii.String("0"),
 		},
+		VpcSubnets: &awsec2.SubnetSelection{
+			SubnetType: awsec2.SubnetType_PUBLIC,
+		},
 	})
 
 	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
