@@ -23,7 +23,14 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{})
+	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
+		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
+			Name:       jsii.String("public subnet"),
+			SubnetType: awsec2.SubnetType_PUBLIC,
+		}},
+		NatGateways: jsii.Number(0),
+	})
+
 	engine := awsrds.DatabaseInstanceEngine_Postgres(&awsrds.PostgresInstanceEngineProps{
 		Version: awsrds.PostgresEngineVersion_VER_16_3(),
 	})
@@ -47,17 +54,16 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		},
 	)
 
-	//cert := awscertificatemanager.NewCertificate(stack, jsii.String("ssl cert"), &awscertificatemanager.CertificateProps{
-	//	DomainName: jsii.String("troop-71.com"),
-	//	Validation: awscertificatemanager.CertificateValidation_FromDns(importedHostedZone),
-	//})
-
 	ecs := awsecspatterns.NewApplicationLoadBalancedFargateService(stack, jsii.String("wikijs"), &awsecspatterns.ApplicationLoadBalancedFargateServiceProps{
 		AssignPublicIp:       jsii.Bool(true),
 		EnableECSManagedTags: jsii.Bool(true),
 		RedirectHTTP:         jsii.Bool(true),
 		Protocol:             awselasticloadbalancingv2.ApplicationProtocol_HTTPS,
-		//Certificate:          cert,
+		Cpu:                  jsii.Number(512),
+		CapacityProviderStrategies: &[]*awsecs.CapacityProviderStrategy{{
+			CapacityProvider: jsii.String("FARGATE_SPOT"),
+		}},
+
 		HealthCheck: &awsecs.HealthCheck{
 			Command: &[]*string{
 				jsii.String("CMD-SHELL"),
