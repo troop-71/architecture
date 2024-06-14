@@ -44,7 +44,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		},
 		BackupRetention:  awscdk.Duration_Days(jsii.Number(7)),
-		AllocatedStorage: jsii.Number(40),
+		AllocatedStorage: jsii.Number(20),
 	})
 
 	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
