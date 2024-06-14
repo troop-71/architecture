@@ -24,7 +24,6 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
 	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
-		MaxAzs: jsii.Number(1),
 		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
 			Name:       jsii.String("public subnet"),
 			SubnetType: awsec2.SubnetType_PUBLIC,
@@ -69,9 +68,6 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		MemoryLimitMiB:       jsii.Number(1024),
 		CapacityProviderStrategies: &[]*awsecs.CapacityProviderStrategy{{
 			CapacityProvider: jsii.String("FARGATE_SPOT"),
-			Weight:           jsii.Number(1000),
-		}, {
-			CapacityProvider: jsii.String("FARGATE"),
 			Weight:           jsii.Number(1),
 		}},
 
