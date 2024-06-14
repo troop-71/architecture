@@ -24,10 +24,10 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
 	vpc := awsec2.NewVpc(stack, jsii.String("vpc"), &awsec2.VpcProps{
-		SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
-			Name:       jsii.String("public subnet"),
-			SubnetType: awsec2.SubnetType_PUBLIC,
-		}},
+		//SubnetConfiguration: &[]*awsec2.SubnetConfiguration{{
+		//	Name:       jsii.String("public subnet"),
+		//	SubnetType: awsec2.SubnetType_PUBLIC,
+		//}},
 		NatGateways: jsii.Number(0),
 	})
 
@@ -43,9 +43,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		Parameters: &map[string]*string{
 			"rds.force_ssl": jsii.String("0"),
 		},
-		VpcSubnets: &awsec2.SubnetSelection{
-			SubnetType: awsec2.SubnetType_PUBLIC,
-		},
+		//VpcSubnets: &awsec2.SubnetSelection{
+		//	SubnetType: awsec2.SubnetType_PUBLIC,
+		//},
 		BackupRetention:  awscdk.Duration_Days(jsii.Number(7)),
 		AllocatedStorage: jsii.Number(20),
 	})
