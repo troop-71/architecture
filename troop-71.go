@@ -40,12 +40,11 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
 		Engine:       engine,
 		DatabaseName: jsii.String("wiki"),
-		Parameters: &map[string]*string{
-			"rds.force_ssl": jsii.String("0"),
-		},
 		VpcSubnets: &awsec2.SubnetSelection{
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		},
+		BackupRetention:  awscdk.Duration_Days(jsii.Number(7)),
+		AllocatedStorage: jsii.Number(40),
 	})
 
 	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
@@ -84,7 +83,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 				&awsecs.RepositoryImageProps{},
 			),
 			Environment: &map[string]*string{
+				"HA":      jsii.String("true"),
 				"DB_NAME": jsii.String("wiki"),
+				"DB_SSL":  jsii.String("true"),
 			},
 			Secrets: &map[string]awsecs.Secret{
 				"DB_PASS": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("password")),
