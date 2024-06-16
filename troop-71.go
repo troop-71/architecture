@@ -30,6 +30,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		}},
 		NatGateways: jsii.Number(0),
 		MaxAzs:      jsii.Number(1),
+		IpAddresses: awsec2.IpAddresses_Cidr(jsii.String("10.1.0.0/16")),
 	})
 
 	engine := awsrds.DatabaseInstanceEngine_Postgres(&awsrds.PostgresInstanceEngineProps{
