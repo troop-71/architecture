@@ -28,14 +28,20 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			Name:       jsii.String("public subnet"),
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		}},
+		AvailabilityZones: &[]*string{
+			jsii.String("us-west-2a"),
+			jsii.String("us-west-2b"),
+		},
 		NatGateways: jsii.Number(0),
 	})
 
 	lb := awselasticloadbalancingv2.NewApplicationLoadBalancer(stack, jsii.String("lb"), &awselasticloadbalancingv2.ApplicationLoadBalancerProps{
 		Vpc: vpc,
 		VpcSubnets: &awsec2.SubnetSelection{
-			AvailabilityZones: &[]*string{jsii.String("us-west-2a")},
-			SubnetType:        awsec2.SubnetType_PUBLIC,
+			AvailabilityZones: &[]*string{
+				jsii.String("us-west-2a"),
+			},
+			SubnetType: awsec2.SubnetType_PUBLIC,
 		},
 		InternetFacing: jsii.Bool(true),
 	})
@@ -53,8 +59,10 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			"rds.force_ssl": jsii.String("0"),
 		},
 		VpcSubnets: &awsec2.SubnetSelection{
-			AvailabilityZones: &[]*string{jsii.String("us-west-2a")},
-			SubnetType:        awsec2.SubnetType_PUBLIC,
+			AvailabilityZones: &[]*string{
+				jsii.String("us-west-2a"),
+			},
+			SubnetType: awsec2.SubnetType_PUBLIC,
 		},
 		BackupRetention:    awscdk.Duration_Days(jsii.Number(7)),
 		AllocatedStorage:   jsii.Number(20),
