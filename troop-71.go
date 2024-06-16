@@ -29,6 +29,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		}},
 		NatGateways: jsii.Number(0),
+		MaxAzs:      jsii.Number(1),
 	})
 
 	engine := awsrds.DatabaseInstanceEngine_Postgres(&awsrds.PostgresInstanceEngineProps{
