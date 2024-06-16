@@ -28,22 +28,7 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			Name:       jsii.String("public subnet"),
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		}},
-		AvailabilityZones: &[]*string{
-			jsii.String("us-west-2a"),
-			jsii.String("us-west-2b"),
-		},
 		NatGateways: jsii.Number(0),
-	})
-
-	lb := awselasticloadbalancingv2.NewApplicationLoadBalancer(stack, jsii.String("lb"), &awselasticloadbalancingv2.ApplicationLoadBalancerProps{
-		Vpc: vpc,
-		VpcSubnets: &awsec2.SubnetSelection{
-			AvailabilityZones: &[]*string{
-				jsii.String("us-west-2a"),
-			},
-			SubnetType: awsec2.SubnetType_PUBLIC,
-		},
-		InternetFacing: jsii.Bool(true),
 	})
 
 	engine := awsrds.DatabaseInstanceEngine_Postgres(&awsrds.PostgresInstanceEngineProps{
@@ -51,8 +36,11 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 	})
 
 	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
-		Vpc:          vpc,
-		InstanceType: awsec2.InstanceType_Of(awsec2.InstanceClass_T4G, awsec2.InstanceSize_MICRO),
+		Vpc: vpc,
+		InstanceType: awsec2.InstanceType_Of(
+			awsec2.InstanceClass_T4G,
+			awsec2.InstanceSize_MICRO,
+		),
 		Engine:       engine,
 		DatabaseName: jsii.String("wiki"),
 		Parameters: &map[string]*string{
@@ -64,7 +52,6 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		BackupRetention:    awscdk.Duration_Days(jsii.Number(7)),
 		AllocatedStorage:   jsii.Number(20),
 		PubliclyAccessible: jsii.Bool(false),
-		AvailabilityZone:   jsii.String("us-west-2a"),
 	})
 
 	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
@@ -87,10 +74,6 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			CapacityProvider: jsii.String("FARGATE_SPOT"),
 			Weight:           jsii.Number(1),
 		}},
-		TaskSubnets: &awsec2.SubnetSelection{
-			AvailabilityZones: &[]*string{jsii.String("us-west-2a")},
-			SubnetType:        awsec2.SubnetType_PUBLIC,
-		},
 		HealthCheck: &awsecs.HealthCheck{
 			Command: &[]*string{
 				jsii.String("CMD-SHELL"),
@@ -118,7 +101,6 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		ListenerPort: jsii.Number(443),
 		DomainName:   jsii.String("troop-71.com"),
 		DomainZone:   importedHostedZone,
-		LoadBalancer: lb,
 	})
 
 	postgres.Connections().AllowDefaultPortFrom(
