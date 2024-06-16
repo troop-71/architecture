@@ -29,8 +29,6 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		}},
 		NatGateways: jsii.Number(0),
-		MaxAzs:      jsii.Number(1),
-		IpAddresses: awsec2.IpAddresses_Cidr(jsii.String("10.1.0.0/16")),
 	})
 
 	engine := awsrds.DatabaseInstanceEngine_Postgres(&awsrds.PostgresInstanceEngineProps{
@@ -48,8 +46,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		VpcSubnets: &awsec2.SubnetSelection{
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		},
-		BackupRetention:  awscdk.Duration_Days(jsii.Number(7)),
-		AllocatedStorage: jsii.Number(20),
+		BackupRetention:    awscdk.Duration_Days(jsii.Number(7)),
+		AllocatedStorage:   jsii.Number(20),
+		PubliclyAccessible: jsii.Bool(false),
 	})
 
 	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
