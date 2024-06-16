@@ -59,14 +59,12 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			"rds.force_ssl": jsii.String("0"),
 		},
 		VpcSubnets: &awsec2.SubnetSelection{
-			AvailabilityZones: &[]*string{
-				jsii.String("us-west-2a"),
-			},
 			SubnetType: awsec2.SubnetType_PUBLIC,
 		},
 		BackupRetention:    awscdk.Duration_Days(jsii.Number(7)),
 		AllocatedStorage:   jsii.Number(20),
 		PubliclyAccessible: jsii.Bool(false),
+		AvailabilityZone:   jsii.String("us-west-2a"),
 	})
 
 	importedHostedZone := awsroute53.HostedZone_FromHostedZoneAttributes(
