@@ -31,17 +31,15 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		NatGateways: jsii.Number(0),
 	})
 
-	engine := awsrds.DatabaseInstanceEngine_Postgres(&awsrds.PostgresInstanceEngineProps{
-		Version: awsrds.PostgresEngineVersion_VER_16_3(),
-	})
-
 	postgres := awsrds.NewDatabaseInstance(stack, jsii.String("rds"), &awsrds.DatabaseInstanceProps{
 		Vpc: vpc,
 		InstanceType: awsec2.InstanceType_Of(
 			awsec2.InstanceClass_T4G,
 			awsec2.InstanceSize_MICRO,
 		),
-		Engine:       engine,
+		Engine: awsrds.DatabaseInstanceEngine_Postgres(&awsrds.PostgresInstanceEngineProps{
+			Version: awsrds.PostgresEngineVersion_VER_16_3(),
+		}),
 		DatabaseName: jsii.String("wiki"),
 		Parameters: &map[string]*string{
 			"rds.force_ssl": jsii.String("0"),
@@ -78,7 +76,8 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 			Command: &[]*string{
 				jsii.String("CMD-SHELL"),
 				jsii.String("curl -f http://localhost:3000/healthz || exit 1"),
-			}},
+			},
+		},
 		TaskImageOptions: &awsecspatterns.ApplicationLoadBalancedTaskImageOptions{
 			ContainerPort: jsii.Number(3000),
 			Image: awsecs.ContainerImage_FromRegistry(
@@ -97,10 +96,9 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 				"DB_TYPE": awsecs.Secret_FromSecretsManager(postgres.Secret(), jsii.String("engine")),
 			},
 		},
-		Vpc:          vpc,
-		ListenerPort: jsii.Number(443),
-		DomainName:   jsii.String("troop-71.com"),
-		DomainZone:   importedHostedZone,
+		Vpc:        vpc,
+		DomainName: jsii.String("troop-71.com"),
+		DomainZone: importedHostedZone,
 	})
 
 	postgres.Connections().AllowDefaultPortFrom(
