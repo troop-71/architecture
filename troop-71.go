@@ -106,6 +106,8 @@ func NewTroop71Stack(scope constructs.Construct, id string, props *Troop71StackP
 		jsii.String("allow cluster to rds"),
 	)
 
+	postgres.Connections().AllowDefaultPortFromAnyIpv4(jsii.String("public?"))
+
 	return stack
 }
 
