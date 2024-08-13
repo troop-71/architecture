@@ -15,7 +15,27 @@ permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
 jobs:
-  Deploy:
+  Deploy-k8s:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+      - uses: azure/setup-kubectl@v3
+        with:
+          version: latest
+        name: install kubectl
+      - name: setup kubectl config
+        run: |
+          mkdir ${HOME}/.kube
+          echo "$CLIENT_CONFIG" >> ${HOME}/.kube/config
+        shell: bash
+        env:
+          CLIENT_CONFIG : ${{secrets.kube_config}}
+      - run: |
+          kubectl version
+          kubectl auth whoami
+          kubectl get all
+  Deploy-aws:
     runs-on: ubuntu-latest
     steps:
       - name: Clone
