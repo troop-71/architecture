@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: public
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  name: wiki-js-ingress
+  namespace: troop-71
+spec:
+  tls:
+    - hosts:
+        - troop-71.pessimistic-it.com
+      secretName: troop-71-pessimistic-it-tls
+  rules:
+    - host: troop-71.pessimistic-it.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: wiki-js-service
+                port:
+                  number: 3000
+            pathType: Prefix
+            path: /

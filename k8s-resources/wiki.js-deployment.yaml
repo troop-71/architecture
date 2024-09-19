@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiki-js-deployment
+  namespace: troop-71
+spec:
+  selector:
+    matchLabels:
+      app: wiki-js
+  template:
+    metadata:
+      labels:
+        app: wiki-js
+    spec:
+      securityContext:
+        fsGroup: 0
+      containers:
+        - image: requarks/wiki:2
+          env:
+            - name: DB_TYPE
+              value: postgres
+            - name: DB_HOST
+              value: postgres-service.troop-71
+            - name: DB_NAME
+              value: wiki
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: password
+                  optional: false
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: username
+                  optional: false
+          name: wiki-js
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: 800m
+            requests:
+              memory: 32Mi
+              cpu: 10m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiki-js-service
+  namespace: troop-71
+spec:
+  ports:
+    - name: server
+      port: 3000
+  selector:
+    app: wiki-js
