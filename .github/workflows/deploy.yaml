@@ -24,17 +24,19 @@ jobs:
         with:
           version: 'v1.28.12'
         name: install kubectl
-      - name: confirm kubectl config
+      - name: setup kubectl config
         run: |
           mkdir ${HOME}/.kube
           echo "$CLIENT_CONFIG" >> ${HOME}/.kube/config
         shell: bash
         env:
           CLIENT_CONFIG : ${{secrets.kube_config}}
-      - run: |
+      - name: confirm kubectl config
+        run: |
           kubectl version
-          kubectl auth whoami
-          kubectl get all
+      - name: apply resources folder
+        run: |
+          kubectl apply -f k8s-resources
   Deploy-aws:
     runs-on: ubuntu-latest
     steps:
