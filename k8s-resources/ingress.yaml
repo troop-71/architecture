@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - troop-71.pessimistic-it.com
-      secretName: troop-71-pessimistic-it-tls
+        - troop-71.com
+      secretName: troop-71-tls
   rules:
-    - host: troop-71.pessimistic-it.com
+    - host: troop-71.com
       http:
         paths:
           - backend:
