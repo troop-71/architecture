@@ -37,6 +37,7 @@ jobs:
       - name: apply resources folder
         run: |
           kubectl apply -f k8s-resources
+          kubectl rollout status -n troop-71 deployments
   Deploy-aws:
     runs-on: ubuntu-latest
     steps:
