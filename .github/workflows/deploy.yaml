@@ -38,40 +38,40 @@ jobs:
         run: |
           kubectl apply -f k8s-resources
           kubectl rollout status -n troop-71 deployments
-  Deploy-aws:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone
-        uses: actions/checkout@v3
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1.7.0
-        with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/GitHubActions
-          role-session-name: GitHub_to_AWS_via_FederatedOIDC
-          aws-region: ${{ env.AWS_REGION }}
-      - uses: actions/setup-node@v4
-        name: Setup Node
-        with:
-          node-version: 22
-      - name: Sts GetCallerIdentity
-        run: |
-          aws sts get-caller-identity
-          aws --version
-      - name: Install CDK
-        run: |
-          npm install -g aws-cdk
-          cdk --version
-#      - name: Bootstrap CDK
+#  Deploy-aws:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Clone
+#        uses: actions/checkout@v3
+#      - name: configure aws credentials
+#        uses: aws-actions/configure-aws-credentials@v1.7.0
+#        with:
+#          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/GitHubActions
+#          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+#          aws-region: ${{ env.AWS_REGION }}
+#      - uses: actions/setup-node@v4
+#        name: Setup Node
+#        with:
+#          node-version: 22
+#      - name: Sts GetCallerIdentity
 #        run: |
-#          cdk bootstrap aws://${{ env.AWS_ACCOUNT }}/${{ env.AWS_REGION }}
-      - uses: actions/setup-go@v5
-        name: Install Go
-        with:
-          go-version: '^1.22'
-      - run: go version
-      - name: Test
-        run: |
-          go test
-      - name: Deploy
-        run: |
-          cdk destroy -f
+#          aws sts get-caller-identity
+#          aws --version
+#      - name: Install CDK
+#        run: |
+#          npm install -g aws-cdk
+#          cdk --version
+##      - name: Bootstrap CDK
+##        run: |
+##          cdk bootstrap aws://${{ env.AWS_ACCOUNT }}/${{ env.AWS_REGION }}
+#      - uses: actions/setup-go@v5
+#        name: Install Go
+#        with:
+#          go-version: '^1.22'
+#      - run: go version
+#      - name: Test
+#        run: |
+#          go test
+#      - name: Deploy
+#        run: |
+#          cdk destroy -f
