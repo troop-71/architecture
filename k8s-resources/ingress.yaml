@@ -4,7 +4,6 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: public
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
   name: wiki-js-ingress
   namespace: troop-71
 spec:
